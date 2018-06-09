@@ -29,11 +29,7 @@ public class MainActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         String userNmae = mAuth.getCurrentUser().getEmail();
         TextView tv = findViewById(R.id.titleM);
-        tv.setText(userNmae);
-
-
-
-
+        tv.setText("Hello " + userNmae);
 
 /*
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
