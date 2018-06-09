@@ -8,23 +8,12 @@
     android:orientation="vertical"
     android:gravity="center">
 
-    <android.support.design.widget.AppBarLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary" />
-
-    </android.support.design.widget.AppBarLayout>
-
     <TextView
+        android:id="@+id/titleM"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:gravity="center"
-        android:text="Multi Player"
+        android:text="Musify"
         android:textSize="50dp" />
 
     <ImageView
