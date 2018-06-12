@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -27,10 +28,13 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         mAuth = FirebaseAuth.getInstance();
-        String userNmae = mAuth.getCurrentUser().getEmail();
-        TextView tv = findViewById(R.id.titleM);
-        tv.setText("Hello " + userNmae);
-
+        if(mAuth.getCurrentUser() != null){
+            String userNmae = mAuth.getCurrentUser().getEmail();
+            TextView tv = findViewById(R.id.titleM);
+            tv.setText("Hello " + userNmae);
+        }else{
+            Toast.makeText(this, "somthing wrong", Toast.LENGTH_SHORT).show();
+        }
 /*
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");

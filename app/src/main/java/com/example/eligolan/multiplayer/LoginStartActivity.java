@@ -1,7 +1,10 @@
 package com.example.eligolan.multiplayer;
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.support.annotation.NonNull;
 import android.support.constraint.ConstraintLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -56,6 +59,10 @@ public class LoginStartActivity extends AppCompatActivity {
     }
 
     public void SignIn(View view) {
+        if(!checkIfInternetConnected()){
+            Toast.makeText(this,"not Internet Connection",Toast.LENGTH_LONG).show();
+            return;
+        }
 
         name = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
@@ -91,7 +98,13 @@ public class LoginStartActivity extends AppCompatActivity {
 
     }
 
+
     public void Register(View view) {
+
+        if(!checkIfInternetConnected()){
+            Toast.makeText(this,"not Internet Connection",Toast.LENGTH_LONG).show();
+            return;
+        }
 
         name = (EditText) findViewById(R.id.email);
         password = (EditText) findViewById(R.id.password);
@@ -146,6 +159,18 @@ public class LoginStartActivity extends AppCompatActivity {
             return "name='" + name + '\'' +
                     ", password='" + password + '\'';
         }
+    }
+
+    private boolean checkIfInternetConnected() {
+
+        ConnectivityManager connectivityManager = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+        if(connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_MOBILE).getState() == NetworkInfo.State.CONNECTED ||
+                connectivityManager.getNetworkInfo(ConnectivityManager.TYPE_WIFI).getState() == NetworkInfo.State.CONNECTED) {
+            //we are connected to a network
+            return true;
+        }
+        else
+            return false;
     }
 
 }
