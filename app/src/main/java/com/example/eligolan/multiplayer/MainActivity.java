@@ -2,6 +2,7 @@ package com.example.eligolan.multiplayer;
 
 
 import android.content.Context;
+import android.content.Intent;
 import android.media.SoundPool;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -11,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -87,6 +89,22 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener()
+        {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view,
+                                    int position, long id) {
+                // TODO Auto-generated method stub
+                Room r = adapter.getItem(position);
+                //Toast.makeText(MainActivity.this, r.name, Toast.LENGTH_SHORT).show();
+
+                Intent intent = new Intent(MainActivity.this, RoomPlayer.class);
+                intent.putExtra("roomName", r.name);
+                intent.putExtra("roomManager", r.manager);
+                startActivity(intent);
             }
         });
 
