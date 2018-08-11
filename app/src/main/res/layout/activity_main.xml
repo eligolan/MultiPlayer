@@ -24,8 +24,19 @@
         android:textColor="#000010"
         android:textSize="25dp" />
 
+    <EditText
+        android:id="@+id/roomName"
+        android:textColor="#f0f0f0"
+        android:textColorHint="#cccccc"
+        android:textSize="18sp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="name of new room"
+        android:inputType="textEmailAddress" />
+
     <Button
         android:id="@+id/button"
+        android:onClick="addRoom"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Add new room"
