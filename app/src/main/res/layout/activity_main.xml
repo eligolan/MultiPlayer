@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -9,18 +9,33 @@
 
     <TextView
         android:id="@+id/titleM"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="#010000"
         android:gravity="center"
         android:text="Musify"
+        android:textColor="#ffffff"
+        android:textSize="25dp" />
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#FFD700"
+        android:text="Rooms:"
+        android:textColor="#000010"
         android:textSize="25dp" />
 
-    <ImageView
-        android:layout_centerHorizontal="true"
-        android:id="@+id/imageView1"
-        android:layout_width="89dp"
-        android:layout_height="110dp"
-        android:layout_marginTop="10dp"
-        android:src="@drawable/ic_action_name" />
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Add new room"
+        android:textSize="25dp"/>
 
-</RelativeLayout>
+    <ListView
+        android:layout_above="@+id/messageBoxLayout"
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+    </ListView>
+
+</LinearLayout>

@@ -14,6 +14,8 @@ import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.EmailAuthProvider;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -21,6 +23,7 @@ public class MainActivity extends AppCompatActivity {
     SoundPool soundPool;
     int starsSoundID, winID;
     FirebaseAuth mAuth;
+    DatabaseReference usersRef;
 
 
     @Override
@@ -35,6 +38,14 @@ public class MainActivity extends AppCompatActivity {
         }else{
             Toast.makeText(this, "somthing wrong", Toast.LENGTH_SHORT).show();
         }
+
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        usersRef = database.getReference("rooms");
+/*        if(usersRef == null){
+            Toast.makeText(this,"is null",Toast.LENGTH_SHORT).show();
+        }else{
+            Toast.makeText(this,"ok",Toast.LENGTH_SHORT).show();
+        }*/
 /*
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("");
