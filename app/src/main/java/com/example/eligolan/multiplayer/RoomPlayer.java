@@ -11,6 +11,12 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
 public class RoomPlayer extends AppCompatActivity {
 
     TextView textView;
@@ -18,20 +24,42 @@ public class RoomPlayer extends AppCompatActivity {
     Handler updateHandler = new Handler();
     MediaPlayer mediaPlayer;
     boolean doneLoading;
+    DatabaseReference roomsRef;
+    String nRoom;
     int tries = 0;
+    String idRoom;
+    int currPos = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_player);
         /* set text room */
-        String nRoom = getIntent().getStringExtra("roomName");
+        nRoom = getIntent().getStringExtra("roomName");
         TextView messageBox;
         messageBox = findViewById(R.id.nameRoom);
         messageBox.setText(nRoom);
         /* seek bar */
         seekBar = (SeekBar) findViewById(R.id.seekBar);
 
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        roomsRef = database.getReference("rooms");
 
+        FirebaseDatabase.getInstance().getReference().child("rooms")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
+                            if(room.name.equals(nRoom)){
+                                idRoom = snapshot.getKey();
+                                currPos = room.currentSeekBar;
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
 
     @Override
@@ -44,7 +72,7 @@ public class RoomPlayer extends AppCompatActivity {
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 try {
-                    String url = "http://bff.vr2.net/jazz/Dave%20Brubeck%20Quartet%20featuring%20Paul%20Desmond%20-%20Buried%20Treasures%20()/07%20%20-%20Take%20Five.mp3";
+                    String url = getIntent().getStringExtra("url");
                     mediaPlayer.setDataSource(url);
                     mediaPlayer.prepare();
                     doneLoading = true;
@@ -71,6 +99,22 @@ public class RoomPlayer extends AppCompatActivity {
             Toast.makeText(this, "still loading the song..", Toast.LENGTH_LONG).show();
             return;
         }
+        FirebaseDatabase.getInstance().getReference().child("rooms")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
+                            if(room.name.equals(nRoom)){
+                                currPos = room.currentSeekBar;
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
+        mediaPlayer.seekTo(currPos);
         mediaPlayer.start();
         updateHandler.postDelayed(updateSeekBar, 100);
     }
@@ -89,6 +133,11 @@ public class RoomPlayer extends AppCompatActivity {
             return;
         }
         mediaPlayer.pause();
+        int media_length = mediaPlayer.getCurrentPosition();
+        DatabaseReference updateData = FirebaseDatabase.getInstance()
+                .getReference("rooms")
+                .child(idRoom);
+        updateData.child("currentSeekBar").setValue(media_length);
     }
 
     public void stop(View v) {
@@ -99,6 +148,10 @@ public class RoomPlayer extends AppCompatActivity {
         mediaPlayer.pause();
         mediaPlayer.seekTo(0);
         seekBar.setProgress(0);
+        DatabaseReference updateData = FirebaseDatabase.getInstance()
+                .getReference("rooms")
+                .child(idRoom);
+        updateData.child("currentSeekBar").setValue(0);
     }
     @Override
     public void onDestroy() {

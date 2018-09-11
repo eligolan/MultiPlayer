@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, RoomPlayer.class);
                 intent.putExtra("roomName", r.name);
                 intent.putExtra("roomManager", r.manager);
+                intent.putExtra("url",r.urlCurrentSong);
                 startActivity(intent);
             }
         });
@@ -133,6 +134,7 @@ public class MainActivity extends AppCompatActivity {
         Room r = new Room();
         r.name = messageBox.getText().toString();
         r.manager = myEmail;
+        r.urlCurrentSong = "http://bff.vr2.net/jazz/Dave%20Brubeck%20Quartet%20featuring%20Paul%20Desmond%20-%20Buried%20Treasures%20()/07%20%20-%20Take%20Five.mp3";
         roomsRef.child(key).setValue(r);
         messageBox.setText("");
         closeKeyboard(view);
@@ -141,11 +143,15 @@ public class MainActivity extends AppCompatActivity {
     public static class Room{
         public String name;
         public String manager;
+        public String urlCurrentSong;
+        public int currentSeekBar;
         public Room(){}
 
-        public Room(String name,String manager) {
+        public Room(String name,String manager,String url,int seek) {
             this.name = name;
             this.manager = manager;
+            this.urlCurrentSong = url;
+            this.currentSeekBar = seek;
         }
     }
 
