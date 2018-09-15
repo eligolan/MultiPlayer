@@ -17,6 +17,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.util.ArrayList;
+
 public class RoomPlayer extends AppCompatActivity {
 
     TextView textView;
@@ -29,12 +31,20 @@ public class RoomPlayer extends AppCompatActivity {
     int tries = 0;
     String idRoom;
     int currPos = 0;
+    String url;
+    ArrayList<String> songs;
+    AllSongs getSongs;
+    int index;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        getSongs = new AllSongs();
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room_player);
         /* set text room */
         nRoom = getIntent().getStringExtra("roomName");
+        url = getIntent().getStringExtra("url");
+        songs = getSongs.getSongs(nRoom);
+        index = getSongs.getIndex(songs, url);
         TextView messageBox;
         messageBox = findViewById(R.id.nameRoom);
         messageBox.setText(nRoom);
@@ -72,8 +82,8 @@ public class RoomPlayer extends AppCompatActivity {
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 try {
-                    String url = getIntent().getStringExtra("url");
-                    mediaPlayer.setDataSource(url);
+                    mediaPlayer.setDataSource(songs.get(index));
+                    index = getSongs.getNextIndexSong(songs, songs.get(index));
                     mediaPlayer.prepare();
                     doneLoading = true;
                     seekBar.post(new Runnable() {
@@ -95,6 +105,8 @@ public class RoomPlayer extends AppCompatActivity {
         }).start();
     }
     public void play(View v) {
+
+
         if (!doneLoading) {
             Toast.makeText(this, "still loading the song..", Toast.LENGTH_LONG).show();
             return;
@@ -107,6 +119,7 @@ public class RoomPlayer extends AppCompatActivity {
                             MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
                             if(room.name.equals(nRoom)){
                                 currPos = room.currentSeekBar;
+                                room.urlCurrentSong = songs.get(index);
                             }
                         }
                     }

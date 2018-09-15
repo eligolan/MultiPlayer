@@ -134,7 +134,7 @@ public class MainActivity extends AppCompatActivity {
         Room r = new Room();
         r.name = messageBox.getText().toString();
         r.manager = myEmail;
-        r.urlCurrentSong = "http://bff.vr2.net/jazz/Dave%20Brubeck%20Quartet%20featuring%20Paul%20Desmond%20-%20Buried%20Treasures%20()/07%20%20-%20Take%20Five.mp3";
+        r.urlCurrentSong = "http://bff.vr2.net/Don't%20Box%20Me%20In.mp3";
         roomsRef.child(key).setValue(r);
         messageBox.setText("");
         closeKeyboard(view);
