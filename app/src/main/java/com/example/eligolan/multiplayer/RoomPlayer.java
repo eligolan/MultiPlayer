@@ -83,6 +83,7 @@ public class RoomPlayer extends AppCompatActivity {
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 try {
                     mediaPlayer.setDataSource(songs.get(index));
+                    url = songs.get(index);
                     index = getSongs.getNextIndexSong(songs, songs.get(index));
                     mediaPlayer.prepare();
                     doneLoading = true;
@@ -119,7 +120,6 @@ public class RoomPlayer extends AppCompatActivity {
                             MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
                             if(room.name.equals(nRoom)){
                                 currPos = room.currentSeekBar;
-                                room.urlCurrentSong = songs.get(index);
                             }
                         }
                     }
@@ -127,6 +127,10 @@ public class RoomPlayer extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
+        DatabaseReference updateData = FirebaseDatabase.getInstance()
+                .getReference("rooms")
+                .child(idRoom);
+        updateData.child("urlCurrentSong").setValue(url);
         mediaPlayer.seekTo(currPos);
         mediaPlayer.start();
         updateHandler.postDelayed(updateSeekBar, 100);
@@ -151,6 +155,7 @@ public class RoomPlayer extends AppCompatActivity {
                 .getReference("rooms")
                 .child(idRoom);
         updateData.child("currentSeekBar").setValue(media_length);
+        updateData.child("urlCurrentSong").setValue(url);
     }
 
     public void stop(View v) {
