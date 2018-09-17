@@ -53,6 +53,7 @@ public class RoomPlayer extends AppCompatActivity {
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         roomsRef = database.getReference("rooms");
+        mediaPlayer = new MediaPlayer();
 
         FirebaseDatabase.getInstance().getReference().child("rooms")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -95,6 +96,7 @@ public class RoomPlayer extends AppCompatActivity {
                             findViewById(R.id.progressBar).setVisibility(View.GONE);
                         }
                     });
+
                 } catch (Exception e) {
                     e.printStackTrace();
                     setResult(-1);
@@ -104,10 +106,18 @@ public class RoomPlayer extends AppCompatActivity {
             }
 
         }).start();
+        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mp) {
+                finish();
+                DatabaseReference updateData = FirebaseDatabase.getInstance()
+                        .getReference("rooms")
+                        .child(idRoom);
+                updateData.child("currentSeekBar").setValue(0);
+            }
+        });
     }
     public void play(View v) {
-
-
         if (!doneLoading) {
             Toast.makeText(this, "still loading the song..", Toast.LENGTH_LONG).show();
             return;
@@ -131,6 +141,7 @@ public class RoomPlayer extends AppCompatActivity {
                 .getReference("rooms")
                 .child(idRoom);
         updateData.child("urlCurrentSong").setValue(url);
+
         mediaPlayer.seekTo(currPos);
         mediaPlayer.start();
         updateHandler.postDelayed(updateSeekBar, 100);
@@ -156,6 +167,22 @@ public class RoomPlayer extends AppCompatActivity {
                 .child(idRoom);
         updateData.child("currentSeekBar").setValue(media_length);
         updateData.child("urlCurrentSong").setValue(url);
+
+        FirebaseDatabase.getInstance().getReference().child("rooms")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
+                            if(room.name.equals(nRoom)){
+                                currPos = room.currentSeekBar;
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
 
     public void stop(View v) {
@@ -170,6 +197,22 @@ public class RoomPlayer extends AppCompatActivity {
                 .getReference("rooms")
                 .child(idRoom);
         updateData.child("currentSeekBar").setValue(0);
+
+        FirebaseDatabase.getInstance().getReference().child("rooms")
+                .addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
+                            if(room.name.equals(nRoom)){
+                                currPos = room.currentSeekBar;
+                            }
+                        }
+                    }
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                    }
+                });
     }
     @Override
     public void onDestroy() {

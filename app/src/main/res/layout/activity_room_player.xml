@@ -45,6 +45,13 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />
 
+        <ImageView
+            android:id="@+id/imageView1"
+            android:layout_width="89dp"
+            android:layout_height="110dp"
+            android:layout_gravity="center"
+            android:src="@drawable/ic_action_name" />
+
         <SeekBar
             android:thumb="@drawable/seekbar_thumb"
             android:progressDrawable="@drawable/seekbar_progress"
