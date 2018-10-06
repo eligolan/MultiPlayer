@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -17,6 +18,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class RoomPlayer extends AppCompatActivity {
@@ -27,12 +29,16 @@ public class RoomPlayer extends AppCompatActivity {
     MediaPlayer mediaPlayer;
     boolean doneLoading;
     DatabaseReference roomsRef;
+    ImageView img;
+    TextView text ;
     String nRoom;
     int tries = 0;
     String idRoom;
     int currPos = 0;
     String url;
-    ArrayList<String> songs;
+    String currentName;
+    int currentImg;
+    ArrayList<Song> songs;
     AllSongs getSongs;
     int index;
     @Override
@@ -47,9 +53,13 @@ public class RoomPlayer extends AppCompatActivity {
         index = getSongs.getIndex(songs, url);
         TextView messageBox;
         messageBox = findViewById(R.id.nameRoom);
+        img = findViewById(R.id.imageView1);
+        text = findViewById(R.id.textView);
         messageBox.setText(nRoom);
         /* seek bar */
         seekBar = (SeekBar) findViewById(R.id.seekBar);
+        url = songs.get(index).getUrl();
+
 
         FirebaseDatabase database = FirebaseDatabase.getInstance();
         roomsRef = database.getReference("rooms");
@@ -83,9 +93,7 @@ public class RoomPlayer extends AppCompatActivity {
                 mediaPlayer = new MediaPlayer();
                 mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 try {
-                    mediaPlayer.setDataSource(songs.get(index));
-                    url = songs.get(index);
-                    index = getSongs.getNextIndexSong(songs, songs.get(index));
+                    mediaPlayer.setDataSource(songs.get(index).getUrl());
                     mediaPlayer.prepare();
                     doneLoading = true;
                     seekBar.post(new Runnable() {
@@ -106,16 +114,16 @@ public class RoomPlayer extends AppCompatActivity {
             }
 
         }).start();
-        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
-            @Override
-            public void onCompletion(MediaPlayer mp) {
-                finish();
-                DatabaseReference updateData = FirebaseDatabase.getInstance()
-                        .getReference("rooms")
-                        .child(idRoom);
-                updateData.child("currentSeekBar").setValue(0);
-            }
-        });
+//        mediaPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+//            @Override
+//            public void onCompletion(MediaPlayer mp) {
+//                finish();
+//                DatabaseReference updateData = FirebaseDatabase.getInstance()
+//                        .getReference("rooms")
+//                        .child(idRoom);
+//                updateData.child("currentSeekBar").setValue(0);
+//            }
+//        });
     }
     public void play(View v) {
         if (!doneLoading) {
@@ -145,6 +153,11 @@ public class RoomPlayer extends AppCompatActivity {
         mediaPlayer.seekTo(currPos);
         mediaPlayer.start();
         updateHandler.postDelayed(updateSeekBar, 100);
+
+        currentName = songs.get(index).getName();
+        currentImg = songs.get(index).getPhoto();
+        img.setImageResource(currentImg);
+        text.setText(currentName);
     }
 
     Runnable updateSeekBar = new Runnable() {
@@ -166,7 +179,7 @@ public class RoomPlayer extends AppCompatActivity {
                 .getReference("rooms")
                 .child(idRoom);
         updateData.child("currentSeekBar").setValue(media_length);
-        updateData.child("urlCurrentSong").setValue(url);
+        updateData.child("urlCurrentSong").setValue(songs.get(index).getUrl());
 
         FirebaseDatabase.getInstance().getReference().child("rooms")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -213,6 +226,19 @@ public class RoomPlayer extends AppCompatActivity {
                     public void onCancelled(DatabaseError databaseError) {
                     }
                 });
+    }
+
+    public void next(View v) {
+        mediaPlayer.stop();
+        currPos = 0;
+        mediaPlayer.release();
+        DatabaseReference updateData = FirebaseDatabase.getInstance()
+                .getReference("rooms")
+                .child(idRoom);
+        index = getSongs.getNextIndexSong(songs, songs.get(index).getUrl());
+        updateData.child("currentSeekBar").setValue(0);
+        updateData.child("urlCurrentSong").setValue(songs.get(index).getUrl());
+        onResume();
     }
     @Override
     public void onDestroy() {

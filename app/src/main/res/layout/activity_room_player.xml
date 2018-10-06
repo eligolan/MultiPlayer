@@ -4,14 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="#FFFFFF"
     tools:context=".RoomPlayer">
 
     <TextView
         android:id="@+id/nameRoom"
-        android:textColor="#ffffff"
-        android:background="#5875d3"
+        android:textColor="#0a0000"
+        android:background="@drawable/musicbg3"
         android:textSize="24sp"
-        android:fontFamily="casual"
+        android:fontFamily="sans-serif-smallcaps"
         android:gravity="center"
         android:shadowColor="#888888"
         android:shadowDx="-5"
@@ -30,25 +31,25 @@
         android:layout_height="wrap_content">
 
         <TextView
+            android:id="@+id/textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-condensed"
+            android:gravity="center"
+            android:padding="2dp"
+            android:paddingBottom="30dp"
             android:shadowColor="#888888"
             android:shadowDx="-5"
             android:shadowDy="5"
             android:shadowRadius="10"
-            android:padding="20dp"
-            android:paddingBottom="30dp"
             android:text="now playing "
-            android:id="@+id/textView"
             android:textColor="#5875d3"
-            android:textSize="24sp"
-            android:fontFamily="casual"
-            android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:textSize="24sp" />
 
         <ImageView
             android:id="@+id/imageView1"
-            android:layout_width="89dp"
-            android:layout_height="110dp"
+            android:layout_width="205dp"
+            android:layout_height="204dp"
             android:layout_gravity="center"
             android:src="@drawable/ic_action_name" />
 
@@ -93,6 +94,15 @@
             android:fontFamily="casual"
             android:text="stop"
             android:id="@+id/stop"
+            android:layout_weight="1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content" />
+
+        <Button
+            android:onClick="next"
+            android:fontFamily="casual"
+            android:text="next"
+            android:id="@+id/next"
             android:layout_weight="1"
             android:layout_width="0dp"
             android:layout_height="wrap_content" />

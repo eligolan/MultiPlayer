@@ -9,7 +9,7 @@
         android:fontFamily="sans-serif"
         android:id="@+id/name"
         android:textSize="20sp"
-        android:textColor="#525252"
+        android:textColor="#FFFFFFFF"
         android:text="asda"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
@@ -18,7 +18,7 @@
         android:fontFamily="sans-serif"
         android:id="@+id/manager"
         android:textSize="11sp"
-        android:textColor="#888888"
+        android:textColor="#ffffff"
         android:text="not available"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
