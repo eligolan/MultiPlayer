@@ -104,6 +104,7 @@ public class MainActivity extends AppCompatActivity {
                 Intent intent = new Intent(MainActivity.this, RoomPlayer.class);
                 intent.putExtra("roomName", r.name);
                 intent.putExtra("roomManager", r.manager);
+                intent.putExtra("managerKey",r.managerKey);
                 intent.putExtra("url",r.urlCurrentSong);
                 startActivity(intent);
             }
@@ -134,6 +135,7 @@ public class MainActivity extends AppCompatActivity {
         Room r = new Room();
         r.name = messageBox.getText().toString();
         r.manager = myEmail;
+        r.managerKey = FirebaseAuth.getInstance().getCurrentUser().getUid();
         r.urlCurrentSong = "http://bff.vr2.net/Don't%20Box%20Me%20In.mp3";
         roomsRef.child(key).setValue(r);
         messageBox.setText("");
@@ -143,8 +145,10 @@ public class MainActivity extends AppCompatActivity {
     public static class Room{
         public String name;
         public String manager;
+        public String managerKey;
         public String urlCurrentSong;
         public int currentSeekBar;
+        public boolean stop;
         public Room(){}
 
         public Room(String name,String manager,String url,int seek) {
