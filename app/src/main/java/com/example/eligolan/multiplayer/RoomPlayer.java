@@ -76,6 +76,10 @@ public class RoomPlayer extends AppCompatActivity {
         mediaPlayer.seekTo(currPos);
         if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(getIntent().getStringExtra("managerKey"))) {
             controls.setVisibility(View.GONE);
+            currentName = songs.get(index).getName();
+            currentImg = songs.get(index).getPhoto();
+            img.setImageResource(currentImg);
+            text.setText(currentName);
             FirebaseDatabase.getInstance()
                     .getReference()
                     .child("rooms")
@@ -84,7 +88,6 @@ public class RoomPlayer extends AppCompatActivity {
                         @Override
                         public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                             int seekpos = dataSnapshot.child("currentSeekBar").getValue(Integer.class);
-                            toasty(""+seekBar.getMax());
                             boolean stop =dataSnapshot.child("stop").getValue(Boolean.class);
                             if (stop) {
 
@@ -104,6 +107,7 @@ public class RoomPlayer extends AppCompatActivity {
                                 if(!mediaPlayer.isPlaying()){
                                     mediaPlayer.start();
                                 }
+                                mediaPlayer.start();
                                 mediaPlayer.seekTo(seekpos);
                                 seekBar.setProgress(seekpos);
                             }
@@ -162,7 +166,10 @@ public class RoomPlayer extends AppCompatActivity {
                                 MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
                                 if (room.name.equals(nRoom)) {
                                     idRoom = snapshot.getKey();
-                                    //currPos = room.currentSeekBar;
+                                    currentName = songs.get(index).getName();
+                                    currentImg = songs.get(index).getPhoto();
+                                    img.setImageResource(currentImg);
+                                    text.setText(currentName);
                                 }
                             }
                         }
@@ -326,6 +333,7 @@ public class RoomPlayer extends AppCompatActivity {
                 .child(idRoom);
         updateData.child("currentSeekBar").setValue(media_length);
         updateData.child("urlCurrentSong").setValue(songs.get(index).getUrl());
+        updateData.child("stop").setValue(true);
         currPos = media_length;
 /*        FirebaseDatabase.getInstance().getReference().child("rooms")
                 .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -348,6 +356,7 @@ public class RoomPlayer extends AppCompatActivity {
         mediaPlayer.pause();
         mediaPlayer.seekTo(0);
         seekBar.setProgress(0);
+        currPos=0;
         DatabaseReference updateData = FirebaseDatabase.getInstance()
                 .getReference("rooms")
                 .child(idRoom);
