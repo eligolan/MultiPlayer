@@ -1,8 +1,10 @@
 package com.example.eligolan.multiplayer;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
@@ -31,8 +33,9 @@ public class RoomPlayer extends AppCompatActivity {
     MediaPlayer mediaPlayer;
     boolean doneLoading, wasPlay = false;
     DatabaseReference roomsRef;
+    String roomKey;
     ImageView img;
-    TextView text ;
+    TextView text;
     String nRoom;
     int tries = 0;
     String idRoom;
@@ -43,6 +46,7 @@ public class RoomPlayer extends AppCompatActivity {
     ArrayList<Song> songs;
     AllSongs getSongs;
     int index;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         getSongs = new AllSongs();
@@ -51,8 +55,10 @@ public class RoomPlayer extends AppCompatActivity {
         /* set text room */
         nRoom = getIntent().getStringExtra("roomName");
         url = getIntent().getStringExtra("url");
+        roomKey = getIntent().getStringExtra("roomKey");
         songs = getSongs.getSongs(nRoom);
         index = getSongs.getIndex(songs, url);
+
         TextView messageBox;
         messageBox = findViewById(R.id.nameRoom);
         img = findViewById(R.id.imageView1);
@@ -68,42 +74,85 @@ public class RoomPlayer extends AppCompatActivity {
         roomsRef = database.getReference("rooms");
         mediaPlayer = new MediaPlayer();
         mediaPlayer.seekTo(currPos);
-        if(! FirebaseAuth.getInstance().getCurrentUser().getUid().equals(getIntent().getStringExtra("managerKey"))){
+        if (!FirebaseAuth.getInstance().getCurrentUser().getUid().equals(getIntent().getStringExtra("managerKey"))) {
             controls.setVisibility(View.GONE);
-            FirebaseDatabase.getInstance().getReference().child("rooms")
+            FirebaseDatabase.getInstance()
+                    .getReference()
+                    .child("rooms")
+                    .child(roomKey)
                     .addValueEventListener(new ValueEventListener() {
                         @Override
-                        public void onDataChange(DataSnapshot dataSnapshot) {
-                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                                MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
-                                if(room.name.equals(nRoom)){
-                                    idRoom = snapshot.getKey();
-                                    currPos = room.currentSeekBar;
-/*                                    if(!room.stop){
-                                        mediaPlayer.pause();
-*//*                                        mediaPlayer.seekTo(0);
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            int seekpos = dataSnapshot.child("currentSeekBar").getValue(Integer.class);
+                            toasty(""+seekBar.getMax());
+                            boolean stop =dataSnapshot.child("stop").getValue(Boolean.class);
+                            if (stop) {
+
+                                if (seekpos == 0) {
+                                    if (mediaPlayer.isPlaying()) {
+                                        mediaPlayer.stop();
                                         seekBar.setProgress(0);
-                                        return;
-                                    }*/
-
-                                    if (doneLoading) {
-                                        mediaPlayer.seekTo(currPos);
-                                        mediaPlayer.start();
-                                        updateHandler.postDelayed(updateSeekBar, 100);
                                     }
-
-                                    currentName = songs.get(index).getName();
-                                    currentImg = songs.get(index).getPhoto();
-                                    img.setImageResource(currentImg);
-                                    text.setText(currentName);
+                                } else {
+                                    mediaPlayer.seekTo(seekpos);
+                                    seekBar.setProgress(seekpos);
+                                    if (mediaPlayer.isPlaying()) {
+                                        mediaPlayer.pause();
+                                    }
                                 }
+                            } else {
+                                if(!mediaPlayer.isPlaying()){
+                                    mediaPlayer.start();
+                                }
+                                mediaPlayer.seekTo(seekpos);
+                                seekBar.setProgress(seekpos);
                             }
                         }
+
+
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                         }
                     });
-        }else{
+
+
+
+
+//            FirebaseDatabase.getInstance().getReference().child("rooms")
+//                    .addValueEventListener(new ValueEventListener() {
+//                        @Override
+//                        public void onDataChange(DataSnapshot dataSnapshot) {
+//                            for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+//                                MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
+//                                if (room.name.equals(nRoom)) {
+//                                    idRoom = snapshot.getKey();
+//                                    currPos = room.currentSeekBar;
+//                                    if (!room.stop) {
+//                                        mediaPlayer.pause();
+//                                        mediaPlayer.seekTo(0);
+//
+//                                        return;
+//                                    }
+//
+//                                    if (doneLoading) {
+//                                        mediaPlayer.seekTo(currPos);
+//                                        mediaPlayer.start();
+//                                        updateHandler.postDelayed(updateSeekBar, 100);
+//                                    }
+//
+//                                    currentName = songs.get(index).getName();
+//                                    currentImg = songs.get(index).getPhoto();
+//                                    img.setImageResource(currentImg);
+//                                    text.setText(currentName);
+//                                }
+//                            }
+//                        }
+//
+//                        @Override
+//                        public void onCancelled(DatabaseError databaseError) {
+//                        }
+//                    });
+        } else {
             currPos = 0;
             FirebaseDatabase.getInstance().getReference().child("rooms")
                     .addListenerForSingleValueEvent(new ValueEventListener() {
@@ -111,12 +160,13 @@ public class RoomPlayer extends AppCompatActivity {
                         public void onDataChange(DataSnapshot dataSnapshot) {
                             for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
                                 MainActivity.Room room = snapshot.getValue(MainActivity.Room.class);
-                                if(room.name.equals(nRoom)){
+                                if (room.name.equals(nRoom)) {
                                     idRoom = snapshot.getKey();
                                     //currPos = room.currentSeekBar;
                                 }
                             }
                         }
+
                         @Override
                         public void onCancelled(DatabaseError databaseError) {
                         }
@@ -132,6 +182,10 @@ public class RoomPlayer extends AppCompatActivity {
                 }*//*
             }
         });*/
+    }
+
+    public void toasty(String text){
+        Toast.makeText(RoomPlayer.this,text,Toast.LENGTH_LONG).show();
     }
 
     @Override
@@ -177,6 +231,7 @@ public class RoomPlayer extends AppCompatActivity {
 //            }
 //        });
     }
+
     public void play(View v) {
         if (!doneLoading) {
             Toast.makeText(this, "still loading the song..", Toast.LENGTH_LONG).show();
@@ -223,7 +278,7 @@ public class RoomPlayer extends AppCompatActivity {
         new Thread(new Runnable() {
             @Override
             public void run() {
-                while(true) {
+                while (true) {
                     try {
                         DatabaseReference updateData = FirebaseDatabase.getInstance()
                                 .getReference("rooms")
@@ -258,6 +313,7 @@ public class RoomPlayer extends AppCompatActivity {
             }
         }
     };
+
     public void pause(View v) {
         if (!doneLoading) {
             Toast.makeText(this, "still loading the song..", Toast.LENGTH_LONG).show();
@@ -327,6 +383,7 @@ public class RoomPlayer extends AppCompatActivity {
         updateData.child("urlCurrentSong").setValue(songs.get(index).getUrl());
         onResume();
     }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -343,7 +400,6 @@ public class RoomPlayer extends AppCompatActivity {
         super.onBackPressed();
         overridePendingTransition(android.R.anim.fade_in, android.R.anim.slide_out_right);
     }
-
 
 
     SeekBar.OnSeekBarChangeListener seekBarListener = new SeekBar.OnSeekBarChangeListener() {

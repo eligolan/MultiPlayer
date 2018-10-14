@@ -77,6 +77,7 @@ public class MainActivity extends AppCompatActivity {
                 rooms.clear();
                 for (DataSnapshot postSnapshot: dataSnapshot.getChildren()) {
                     Room r = postSnapshot.getValue(Room.class);
+                    r.key = postSnapshot.getKey();
                     rooms.add(r);
                 }
               try{
@@ -102,6 +103,7 @@ public class MainActivity extends AppCompatActivity {
                 //Toast.makeText(MainActivity.this, r.name, Toast.LENGTH_SHORT).show();
 
                 Intent intent = new Intent(MainActivity.this, RoomPlayer.class);
+                intent.putExtra("roomKey",r.key);
                 intent.putExtra("roomName", r.name);
                 intent.putExtra("roomManager", r.manager);
                 intent.putExtra("managerKey",r.managerKey);
@@ -143,6 +145,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public static class Room{
+        public String key = null;
         public String name;
         public String manager;
         public String managerKey;
